@@ -154,14 +154,13 @@ namespace PartsUnlimited.Controllers
                 {
                     //Bug: Remember browser option missing?
                     //Uncomment this and comment the later part if account verification is not needed.
-                    //await SignInManager.SignInAsync(user, isPersistent: false);
 
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
 
-                    await UserManager.SendEmailAsync(user.Id, "Confirm your account", string.Format("Please confirm your account by clicking <a href=\"{0}\">here</a>", callbackUrl));
+                    await UserManager.SendEmailAsync(user.Id, "Confirm your account", string.Format("Please confirm your account by clicking <a href=\"{0}\">here</a>", callbackUrl)).ConfigureAwait(false);
 
 #if !DEMO
                     return RedirectToAction("Index", "Home");
@@ -226,14 +225,9 @@ namespace PartsUnlimited.Controllers
                 string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
                 var callbackUrl = Url.Action("ResetPassword", "Account", new { code = code }, protocol: Request.Url.Scheme);
 
-                var email = new IdentityMessage
-                {
-                    Destination = model.Email,
-                    Body = string.Format("Please reset your password by clicking <a href=\"{0}\">here</a>", callbackUrl),
-                    Subject = "Reset Password"
-                };
+                
 
-                await UserManager.SendEmailAsync(user.Id, "Reset Password", string.Format("Please reset your password by clicking <a href=\"{0}\">here</a>", callbackUrl));
+                await UserManager.SendEmailAsync(user.Id, "Reset Password", string.Format("Please reset your password by clicking <a href=\"{0}\">here</a>", callbackUrl)).ConfigureAwait(false);
 
 #if !DEMO
                 return RedirectToAction("ForgotPasswordConfirmation");
@@ -424,7 +418,7 @@ namespace PartsUnlimited.Controllers
                     result = await UserManager.AddLoginAsync(user.Id, info.Login);
                     if (result.Succeeded)
                     {
-                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false).ConfigureAwait(false);
                         return RedirectToLocal(returnUrl);
                     }
                 }
